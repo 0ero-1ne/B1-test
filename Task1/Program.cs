@@ -141,21 +141,29 @@ namespace Task1
                 var queue = new Queue<string>();
                 for (int f = i * 20 + 1; f <= i * 20 + 20; f++)
                 {
-                    using StreamReader reader = new(directoryPath + $"file{f}.txt", System.Text.Encoding.UTF8, true, 4096);
-                    var str = reader.ReadLine();
-                    while (str != null && str != "\n")
+                    string fileName = directoryPath + $"file{f}.txt";
+                    try
                     {
-                        if (str.Contains(pattern))
+                        using StreamReader reader = new(fileName, System.Text.Encoding.UTF8, true, 4096);
+                        var str = reader.ReadLine();
+                        while (str != null && str != "\n")
                         {
-                            deletedRows++;
+                            if (str.Contains(pattern))
+                            {
+                                deletedRows++;
+                            }
+                            else
+                            {
+                                queue.Enqueue(str + '\n');
+                            }
+                            str = reader.ReadLine();
                         }
-                        else
-                        {
-                            queue.Enqueue(str + '\n');
-                        }
-                        str = reader.ReadLine();
+                        reader.Close();
                     }
-                    reader.Close();
+                    catch (IOException)
+                    {
+                        Console.WriteLine($"Warning: {fileName} not found");
+                    }
                 }
                 lock (locker)
                 {
