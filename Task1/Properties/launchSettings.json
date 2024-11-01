@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Task1": {
-      "commandName": "Project",
-      "commandLineArgs": "generate -o C:\\Test"
+      "commandName": "Project"
     }
   }
 }
