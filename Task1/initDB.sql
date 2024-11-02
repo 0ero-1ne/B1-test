@@ -13,12 +13,12 @@ go
 use task1;
 go
 
-create table useful_data
+create table dbo.useful_data
 (
 	id			   bigint identity(1,1) not null primary key,
 	"date"		   datetime not null,
 	english_string nchar(10) not null,
 	russian_string nchar(10) not null,
-	integer_number int not null,
+	integer_number numeric not null,
 	float_number   float not null
 );
