@@ -1,4 +1,11 @@
-﻿using Task1.Generators;
+﻿using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
+using System.Numerics;
+using System.Reflection.PortableExecutable;
+using Task1.Generators;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Task1
 {
@@ -24,6 +31,9 @@ namespace Task1
                     break;
                 case "concat":
                     Concat(args);
+                    break;
+                case "import":
+                    Import(args);
                     break;
                 default:
                     PrintError("Invalid command");
@@ -185,6 +195,116 @@ namespace Task1
             Console.WriteLine($"{deletedRows} rows where deleted");
         }
 
+        static void Import(string[] args)
+        {
+            if (args.Length < 3)
+            {
+                PrintError("Syntax error.\nImport syntax is: task1 import -f file_path");
+                return;
+            }
+
+            if (args[1] != "-f" || args[2] == "")
+            {
+                PrintError("Syntax error.\nImport syntax is: task1 import -f file_path");
+                return;
+            }
+
+            var filePath = args[2];
+
+            if (!File.Exists(filePath))
+            {
+                PrintError("No such file. Check the path");
+                return;
+            }
+
+            var connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            using SqlConnection connection = new(connectionString);
+
+            try
+            {
+                connection.Open();
+                using StreamReader reader = new(filePath, System.Text.Encoding.UTF8, true, 4096);
+                var str = reader.ReadLine();
+                var queue = new Queue<string>();
+                while (str != null && str != "\n")
+                {
+                    queue.Enqueue(str);
+                    str = reader.ReadLine();
+                }
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                InsertToDB(connectionString, queue);
+                watch.Stop();
+                Console.WriteLine($"Done in {watch}");
+                connection.Close();
+            }
+            catch (SqlException e)
+            {
+                PrintError($"SQL Error: {e.Message}");
+                return;
+            }
+        }
+
+        static void InsertToDB(string connectionString, Queue<string> data)
+        {
+            string query = """
+                set dateformat dmy;
+
+                insert into useful_data (date, english_string, russian_string, integer_number, float_number)
+                values (@date, @eng, @rus, @int_number, @double_number);
+            """;
+
+            using SqlConnection connection = new(connectionString);
+            
+
+            connection.Open(); // Не будет нового соединения, а возьмётся из пула
+
+            SqlTransaction transaction = connection.BeginTransaction();
+            
+            int i = 1;
+
+            foreach (var item in data)
+            {
+                var dataFromString = item.Split("||");
+
+                using SqlCommand command = new(query, connection);
+                command.Transaction = transaction;
+
+                command.Parameters.Add("@date", SqlDbType.DateTime).Value = DateTime.ParseExact(
+                    dataFromString[0],
+                    "dd.mm.yyyy",
+                    new CultureInfo("ru-RU")
+                );
+                command.Parameters.Add("@eng", SqlDbType.Char, 10).Value = dataFromString[1];
+                command.Parameters.Add("@rus", SqlDbType.NChar, 10).Value = dataFromString[2];
+                command.Parameters.Add("@int_number", SqlDbType.Int).Value = int.Parse(dataFromString[3]);
+                command.Parameters.Add("@double_number", SqlDbType.Float).Value = float.Parse(dataFromString[4]);
+
+                try
+                {
+                    var result = command.ExecuteNonQuery();
+
+                    if (result == 0)
+                    {
+                        PrintError($"Transaction failed. Stopping the program...");
+                        return;
+                    }
+
+                    Console.WriteLine($"Row {i++}/{data.Count} inserted");
+                }
+                catch (SqlException e)
+                {
+                    command.Transaction.Rollback();
+                    PrintError($"SQL Error: {e.Message}");
+                    return;
+                }
+                catch (Exception e)
+                {
+                    PrintError($"General Error: {e.Message} {e.StackTrace}");
+                    return;
+                }
+            }
+        }
+        
         static void PrintError(string error)
         {
             Console.WriteLine($"Program error: {error}");
