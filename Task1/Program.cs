@@ -303,6 +303,8 @@ namespace Task1
                     return;
                 }
             }
+
+            transaction.Commit();
         }
         
         static void PrintError(string error)
