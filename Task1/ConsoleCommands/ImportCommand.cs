@@ -81,6 +81,7 @@ namespace Task1.ConsoleCommands
             {
                 var dataFromString = item.Split("||");
 
+                // Такой способ вставки данных является безопасным и защищает от sql-инъекций
                 using SqlCommand command = new(query, connection);
                 command.Transaction = transaction;
 

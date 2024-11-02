@@ -25,7 +25,9 @@
                 PrintError("No such directory. Check the path");
                 return;
             }
-            directoryPath = directoryPath.Last() == '\\' ? directoryPath : directoryPath + '\\'; // Убедимся, что не стоит лишних символов "\"
+
+            // Убедимся, что не стоит лишних символов "\"
+            directoryPath = directoryPath.Last() == '\\' ? directoryPath : directoryPath + '\\';
 
             // Contains("") вернёт true всегда
             // Так, как символ октоторпа в файле не используется, то заменим пустую строку на него

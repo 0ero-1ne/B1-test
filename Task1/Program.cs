@@ -12,7 +12,7 @@ namespace Task1
                 return;
             }
 
-            switch (args[0])
+            switch (args[0]) // выбор команды
             {
                 case "generate":
                     GenerateCommand.Run(args);

@@ -4,6 +4,9 @@
     {
         private readonly Random _random = new();
 
+        // Просто высчитаем случайное количество мс, возьмём по модулю fiveYearsInMs
+        // Отнимем рузельтат от значение текущего времени в мс и получим случайную дату
+
         public DateTime Generate()
         {
             long fiveYearsInMs = (long)5 * 365 * 24 * 60 * 60 * 1000;

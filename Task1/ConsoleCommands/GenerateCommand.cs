@@ -32,13 +32,16 @@ namespace Task1.ConsoleCommands
                 return;
             }
 
-            var randomDirectoryName = englishStringGenerator.Generate(20); // случайное название для папки
+            // случайное название для папки
+            var randomDirectoryName = englishStringGenerator.Generate(20);
+
             var fullPath = directoryPath + (directoryPath.Last() == '\\' ? $"{randomDirectoryName}\\" : $"\\{randomDirectoryName}\\");
             Directory.CreateDirectory(fullPath);
 
             Console.WriteLine($"Generating files into {fullPath}");
 
-            var watch = System.Diagnostics.Stopwatch.StartNew(); // Для подсчёта времени выполнения алгоритма
+            // Для подсчёта времени выполнения алгоритма
+            var watch = System.Diagnostics.Stopwatch.StartNew();
 
             for (int i = 1; i <= 100; i++)
             {

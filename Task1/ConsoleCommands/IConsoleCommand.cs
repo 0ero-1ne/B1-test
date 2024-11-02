@@ -1,5 +1,6 @@
 ﻿namespace Task1.ConsoleCommands
 {
+    // Общий интерфейс консольной команды
     public interface IConsoleCommand
     {
         public static void Run(string[] args) => Console.WriteLine("Method not implemented");

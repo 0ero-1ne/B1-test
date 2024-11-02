@@ -8,7 +8,9 @@ namespace Task1.Generators
 {
     public class StringGenerator(string alphabet)
     {
+        // исходный алфавит в UpperCase и LowerCase
         private readonly string _alphabet = new((alphabet.ToLower() + alphabet.ToUpper()).Distinct().ToArray());
+        
         private readonly Random _random = new();
 
         public string Generate(int length)
