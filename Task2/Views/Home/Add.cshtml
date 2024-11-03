@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.Title = "Task2 - Добавить файл";
+    ViewBag.Header = "Добавить файл";
+    ViewBag.ButtonTitle = "Каталог";
+    ViewBag.ButtonController = "Home";
+    ViewBag.ButtonAction = "Index";
+}
+
+<form>
+    <div class="mb-3">
+        <label for="file-input" class="form-label">Файл</label>
+        <input type="file" class="form-control" id="file-input" required />
+    </div>
+    <button type="submit" class="btn btn-outline-dark">Загрузить</button>
+</form>

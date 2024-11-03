@@ -1,0 +1,33 @@
+﻿@{
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link href="/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <link href="/css/layout.css" rel="stylesheet" />
+</head>
+<body>
+    <header>
+        <nav class="navbar bg-white">
+            <a class="navbar-brand">@ViewBag.Header</a>
+            <form class="form-inline">
+                <a class="btn btn-outline-dark"
+                    asp-controller="@ViewBag.ButtonController"
+                    asp-action="@ViewBag.ButtonAction"
+                    role="button">
+                    @ViewBag.ButtonTitle
+                </a>
+            </form>
+        </nav>
+    </header>
+    <div class="content">
+        @RenderBody()
+    </div>
+    <footer>
+        &copy; @DateTime.Now.Year, 0ero_1ne
+    </footer>
+</body>
+</html>
