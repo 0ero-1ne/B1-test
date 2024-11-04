@@ -30,11 +30,11 @@ public partial class Task2DbContext : DbContext
     {
         modelBuilder.Entity<Bank>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__banks__3213E83F5967CAE0");
+            entity.HasKey(e => e.Id).HasName("PK__banks__3213E83FDDCAF139");
 
             entity.ToTable("banks");
 
-            entity.HasIndex(e => e.Name, "UQ__banks__72E12F1B5EAF2A0B").IsUnique();
+            entity.HasIndex(e => e.Name, "UQ__banks__72E12F1B8867A06A").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Name)
@@ -44,12 +44,12 @@ public partial class Task2DbContext : DbContext
 
         modelBuilder.Entity<Bill>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__bills__3213E83F750AE330");
+            entity.HasKey(e => e.Id).HasName("PK__bills__3213E83FD4811E79");
 
             entity.ToTable("bills");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.BillType).HasColumnName("bill_type");
+            entity.Property(e => e.BillTypeId).HasColumnName("bill_type_id");
             entity.Property(e => e.BookNumber).HasColumnName("book_number");
             entity.Property(e => e.FileId).HasColumnName("file_id");
             entity.Property(e => e.InsaldoActive)
@@ -71,8 +71,8 @@ public partial class Task2DbContext : DbContext
                 .HasColumnType("numeric(38, 2)")
                 .HasColumnName("turnovers_debit");
 
-            entity.HasOne(d => d.BillTypeNavigation).WithMany(p => p.Bills)
-                .HasForeignKey(d => d.BillType)
+            entity.HasOne(d => d.BillType).WithMany(p => p.Bills)
+                .HasForeignKey(d => d.BillTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__bills__bill_type__403A8C7D");
 
@@ -84,11 +84,11 @@ public partial class Task2DbContext : DbContext
 
         modelBuilder.Entity<BillType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__bill_typ__3213E83FA49A8C8E");
+            entity.HasKey(e => e.Id).HasName("PK__bill_typ__3213E83F85C3DAC0");
 
             entity.ToTable("bill_types");
 
-            entity.HasIndex(e => e.Title, "UQ__bill_typ__E52A1BB32C279F85").IsUnique();
+            entity.HasIndex(e => e.Title, "UQ__bill_typ__E52A1BB333DF94F9").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Title)
@@ -98,12 +98,15 @@ public partial class Task2DbContext : DbContext
 
         modelBuilder.Entity<File>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__files__3213E83F158C2BA0");
+            entity.HasKey(e => e.Id).HasName("PK__files__3213E83FC43D1BD9");
 
             entity.ToTable("files");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.BankId).HasColumnName("bank_id");
+            entity.Property(e => e.Description)
+                .HasMaxLength(1024)
+                .HasColumnName("description");
             entity.Property(e => e.EndDate).HasColumnName("end_date");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)

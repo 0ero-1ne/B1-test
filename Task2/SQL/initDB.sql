@@ -38,11 +38,12 @@ values (N'Денежные средства, драгоценные металл
 
 create table files
 (
-	id		   int not null primary key identity(1, 1),
-	name	   nvarchar(255) not null,
-	start_date date not null,
-	end_date   date not null,
-	bank_id	   int not null foreign key references banks(id)
+	id		    int not null primary key identity(1, 1),
+	name	    nvarchar(255) not null,
+	description nvarchar(1024) not null,
+	start_date  date not null,
+	end_date    date not null,
+	bank_id	    int not null foreign key references banks(id)
 );
 
 create table bills
@@ -55,6 +56,6 @@ create table bills
 	turnovers_credit numeric(38, 2) not null,
 	outsaldo_active  numeric(38, 2) not null,
 	outsaldo_passive numeric(38, 2) not null,
-	bill_type		 int not null foreign key references bill_types(id),
+	bill_type_id     int not null foreign key references bill_types(id),
 	file_id			 int not null foreign key references files(id)
 );

@@ -6,7 +6,22 @@
     ViewBag.ButtonAction = "Add";
 }
 
-<h2>Каталог загруженных файлов @ViewBag.BillTypes</h2>
+@if (ViewBag.UploadStatus == true)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Файл успешно загружен на сервер
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+else if (ViewBag.UploadStatus == false)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Ошибка при загрузке файла. Проверьте целостность и структуру файла
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<h2>Каталог загруженных файлов</h2>
 <div class="list-group list-group-flush">
     @if (ViewBag.Files.Length == 0)
     {
@@ -17,8 +32,10 @@
         @foreach (var file in ViewBag.Files)
         {
             <a class="list-group-item list-group-item-action"
-               asp-controller="File"
-               asp-action="Show">
+               asp-controller="home"
+               asp-action="file"
+               asp-route-id="@file.Id"
+               role="button">
                 @file.Name
             </a>
         }

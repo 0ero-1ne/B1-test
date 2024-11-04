@@ -6,10 +6,10 @@
     ViewBag.ButtonAction = "Index";
 }
 
-<form>
+<form method="post" enctype="multipart/form-data" asp-controller="File" asp-action="Post">
     <div class="mb-3">
         <label for="file-input" class="form-label">Файл</label>
-        <input type="file" accept=".xls,.xlsx" class="form-control" id="file-input" required />
+        <input type="file" name="file" accept=".xls,.xlsx" class="form-control" id="file-input" required />
     </div>
     <button type="submit" class="btn btn-outline-dark">Загрузить</button>
 </form>

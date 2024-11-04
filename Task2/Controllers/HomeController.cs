@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Task2.Models;
 
 namespace Task2.Controllers
@@ -7,20 +8,31 @@ namespace Task2.Controllers
     {
         private readonly Task2DbContext? dbContext = dbContext;
 
-        public IActionResult Index()
+        public IActionResult Index(int id)
         {
-            var files = dbContext?.Files.Select(file => new
+            ViewBag.Files = dbContext?.Files.Select(file => new 
             {
                 file.Id,
                 file.Name,
                 Bank = file.Bank.Name
             }).ToArray();
 
-            ViewBag.Files = files;
+            if (Request.Cookies["uploadStatus"] != null)
+            {
+                ViewBag.UploadStatus = Request.Cookies["uploadStatus"] == "1";
+                Response.Cookies.Delete("uploadStatus");
+            }
+
+            dbContext?.Database.CloseConnection();
             return View();
         }
 
         public IActionResult Add()
+        {
+            return View();
+        }
+
+        public IActionResult File(int id)
         {
             return View();
         }

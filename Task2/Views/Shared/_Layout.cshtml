@@ -7,6 +7,7 @@
     <title>@ViewBag.Title</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link href="/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <script src="/lib/bootstrap/js/bootstrap.js"></script>
     <link href="/css/layout.css" rel="stylesheet" />
 </head>
 <body>
@@ -15,8 +16,8 @@
             <a class="navbar-brand">@ViewBag.Header</a>
             <form class="form-inline">
                 <a class="btn btn-outline-dark"
-                    asp-controller="@ViewBag.ButtonController"
-                    asp-action="@ViewBag.ButtonAction"
+                    asp-controller="@ViewBag.ButtonController?.ToLower()"
+                    asp-action="@ViewBag.ButtonAction?.ToLower()"
                     role="button">
                     @ViewBag.ButtonTitle
                 </a>

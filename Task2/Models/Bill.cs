@@ -21,11 +21,11 @@ public partial class Bill
 
     public decimal OutsaldoPassive { get; set; }
 
-    public int BillType { get; set; }
+    public int BillTypeId { get; set; }
 
     public int FileId { get; set; }
 
-    public virtual BillType BillTypeNavigation { get; set; } = null!;
+    public virtual BillType BillType { get; set; } = null!;
 
     public virtual File File { get; set; } = null!;
 }
