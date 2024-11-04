@@ -6,11 +6,21 @@
     ViewBag.ButtonAction = "Add";
 }
 
-<h2>Каталог загруженных файлов</h2>
+<h2>Каталог загруженных файлов @ViewBag.BillTypes</h2>
 <div class="list-group list-group-flush">
-    <a href="#" class="list-group-item list-group-item-action">Cras justo odio</a>
-    <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
-    <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
-    <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
-    <a href="#" class="list-group-item list-group-item-action">Vestibulum at eros</a>
+    @if (ViewBag.Files.Length == 0)
+    {
+        <p>В базе данных нет файлов</p>
+    }
+    else
+    {
+        @foreach (var file in ViewBag.Files)
+        {
+            <a class="list-group-item list-group-item-action"
+               asp-controller="File"
+               asp-action="Show">
+                @file.Name
+            </a>
+        }
+    }
 </div>

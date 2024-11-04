@@ -1,4 +1,8 @@
+using Task2.Models;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<Task2DbContext>();
 
 builder.Services.AddControllersWithViews();
 
