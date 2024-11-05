@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Office.Interop.Excel;
+using System;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -221,6 +223,18 @@ namespace Task2.API
                 }
 
                 await transaction!.CommitAsync();
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+                Marshal.ReleaseComObject(worksheet);
+
+                workbook.Close();
+                Marshal.ReleaseComObject(workbook);
+
+                excel.Quit();
+                Marshal.ReleaseComObject(excel);
+
                 return true;
             }
             catch (Exception ex)
