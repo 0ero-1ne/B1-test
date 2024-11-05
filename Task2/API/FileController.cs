@@ -35,34 +35,40 @@ namespace Task2.API
                 return RedirectToAction("index", "home");
             }
 
-            string filePath = "/files/" + file.FileName;
+            string fileNameWOExtension = Path.GetFileNameWithoutExtension(file.FileName);
+            string dateTime = DateTime.Now.ToString("dd.MM.yyyy HH-mm-ss");
+            string newFileName = $"{fileNameWOExtension} ({dateTime})";
+            string filePath = $"/files/{newFileName}{Path.GetExtension(file.FileName)}";
 
-            using FileStream stream = new(_hostEnvironment?.WebRootPath + filePath, FileMode.OpenOrCreate);
+            using FileStream stream = new(_hostEnvironment?.WebRootPath + filePath, FileMode.Create);
             await file.CopyToAsync(stream);
 
-            var result = await SaveToDb(file.FileName);
+            var result = await SaveToDb(newFileName, filePath);
+
+            if (result == false)
+            {
+                System.IO.File.Delete(_hostEnvironment?.WebRootPath + filePath);
+            }
 
             Response.Cookies.Append("uploadStatus", result ? "1" : "0");
             _db?.Database.CloseConnection();
             return RedirectToAction("index", "home");
         }
 
-        private async Task<bool> SaveToDb(string fileName)
+        private async Task<bool> SaveToDb(string fileName, string filePath)
         {
             Application excel = new();
             Workbook? workbook;
             Worksheet? worksheet;
 
-            string filePath = _hostEnvironment?.WebRootPath + "/files/" + fileName;
-
-            workbook = excel.Workbooks.Open(filePath);
+            workbook = excel.Workbooks.Open(_hostEnvironment?.WebRootPath + filePath);
             worksheet = workbook.Worksheets[1];
 
             using var transaction = _db?.Database.BeginTransaction();
             try
             {
                 string bankName = worksheet.Range["A1"].Value2;
-                string description = worksheet.Range["A2"].Value2 + worksheet.Range["A3"].Value2;
+                string description = worksheet.Range["A2"].Value2 + " " + worksheet.Range["A3"].Value2;
 
                 Regex regex = new(@"\d{2}\.\d{2}\.\d{4}");
                 var dates = regex.Matches(description);

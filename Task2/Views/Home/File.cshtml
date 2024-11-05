@@ -1,9 +1,79 @@
-﻿@{
-    ViewBag.Title = "File";
-    ViewBag.Header = "File";
+﻿@using Task2.Models
+
+@{
+    ViewBag.Title = "Task2 - " + ViewBag.File.Name;
+    ViewBag.Header = ViewBag.File.Name;
     ViewBag.ButtonTitle = "Каталог";
-    ViewBag.ButtonController = "Home";
-    ViewBag.ButtonAction = "Index";
+    ViewBag.ButtonController = "home";
+    ViewBag.ButtonAction = "index";
 }
 
-<h1>@ViewBag.Header</h1>
+<table class="table table-bordered border-black align-middle">
+    <thead>
+        <tr>
+            <th colspan="7" class="text-center">@ViewBag.BankName - @ViewBag.File.Description</th>
+        </tr>
+        <tr>
+            <th rowspan="2" class="text-center align-middle">Б/СЧ</th>
+            <th colspan="2" class="text-center">ВХОДЯЩЕЕ САЛЬДО</th>
+            <th colspan="2" class="text-center">ОБОРОТЫ</th>
+            <th colspan="2" class="text-center">ИСХОДЯЩЕЕ САЛЬДО</th>
+        </tr>
+        <tr>
+            <th class="text-center">Актив</th>
+            <th class="text-center">Пассив</th>
+            <th class="text-center">Дебет</th>
+            <th class="text-center">Кредит</th>
+            <th class="text-center">Актив</th>
+            <th class="text-center">Пассив</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var billType in (IQueryable<IGrouping<BillType, Bill>>)ViewBag.GroupedBills)
+        {
+            <tr>
+                <td colspan="7" class="text-center">Класс @billType.Key.Id @billType.Key.Title</td>
+            </tr>
+
+            @foreach (var bill in billType)
+            {
+                <tr>
+                    <td class="text-center @(bill.BookNumber < 1000 ? "fw-bold" : null)">@bill.BookNumber</td>
+                    <td class="bill-cell text-center @(bill.BookNumber < 1000 ? "fw-bold" : null)">@bill.InsaldoActive</td>
+                    <td class="bill-cell text-center @(bill.BookNumber < 1000 ? "fw-bold" : null)">@bill.InsaldoPassive</td>
+                    <td class="bill-cell text-center @(bill.BookNumber < 1000 ? "fw-bold" : null)">@bill.TurnoversDebit</td>
+                    <td class="bill-cell text-center @(bill.BookNumber < 1000 ? "fw-bold" : null)">@bill.TurnoversCredit</td>
+                    <td class="bill-cell text-center @(bill.BookNumber < 1000 ? "fw-bold" : null)">@bill.OutsaldoActive</td>
+                    <td class="bill-cell text-center @(bill.BookNumber < 1000 ? "fw-bold" : null)">@bill.OutsaldoPassive</td>
+                </tr>
+            }
+
+            <tr>
+                <td class="text-center fw-bold">Баланс по классу</td>
+                <td class="bill-cell text-center fw-bold">@billType.Where(b => b.BillTypeId == @billType.Key.Id && b.BookNumber >= 1000).Sum(b => b.InsaldoActive)</td>
+                <td class="bill-cell text-center fw-bold">@billType.Where(b => b.BillTypeId == @billType.Key.Id && b.BookNumber >= 1000).Sum(b => b.InsaldoPassive)</td>
+                <td class="bill-cell text-center fw-bold">@billType.Where(b => b.BillTypeId == @billType.Key.Id && b.BookNumber >= 1000).Sum(b => b.TurnoversDebit)</td>
+                <td class="bill-cell text-center fw-bold">@billType.Where(b => b.BillTypeId == @billType.Key.Id && b.BookNumber >= 1000).Sum(b => b.TurnoversCredit)</td>
+                <td class="bill-cell text-center fw-bold">@billType.Where(b => b.BillTypeId == @billType.Key.Id && b.BookNumber >= 1000).Sum(b => b.OutsaldoActive)</td>
+                <td class="bill-cell text-center fw-bold">@billType.Where(b => b.BillTypeId == @billType.Key.Id && b.BookNumber >= 1000).Sum(b => b.OutsaldoPassive)</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td class="text-center fw-bold">Баланс</td>
+            <td class="bill-cell text-center fw-bold">@ViewBag.Sums[0]</td>
+            <td class="bill-cell text-center fw-bold">@ViewBag.Sums[1]</td>
+            <td class="bill-cell text-center fw-bold">@ViewBag.Sums[2]</td>
+            <td class="bill-cell text-center fw-bold">@ViewBag.Sums[3]</td>
+            <td class="bill-cell text-center fw-bold">@ViewBag.Sums[4]</td>
+            <td class="bill-cell text-center fw-bold">@ViewBag.Sums[5]</td>
+        </tr>
+    </tfoot>
+</table>
+<script>
+    document.querySelectorAll(".bill-cell").forEach(cell => {
+        let cellValue = +cell.innerHTML;
+        cell.innerHTML = cellValue.toLocaleString('us-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    });
+</script>

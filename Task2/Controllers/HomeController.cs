@@ -34,6 +34,25 @@ namespace Task2.Controllers
 
         public IActionResult File(int id)
         {
+            var file = dbContext?.Files.FirstOrDefault(file => file.Id == id);
+            if (file == null)
+            {
+                return NotFound("404 - Not found");
+            }
+
+            ViewBag.File = file;
+            ViewBag.BankName = dbContext?.Banks.FirstOrDefault(bank => bank.Id == file.BankId)!.Name;
+            ViewBag.GroupedBills = dbContext?.Bills.Where(bill => bill.FileId == file.Id).GroupBy(bill => bill.BillType);
+
+            List<decimal> sumResult = [];
+            sumResult.Add(dbContext!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.InsaldoActive));
+            sumResult.Add(dbContext!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.InsaldoPassive));
+            sumResult.Add(dbContext!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.TurnoversDebit));
+            sumResult.Add(dbContext!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.TurnoversCredit));
+            sumResult.Add(dbContext!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.OutsaldoActive));
+            sumResult.Add(dbContext!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.OutsaldoPassive));
+            ViewBag.Sums = sumResult;
+
             return View();
         }
     }
