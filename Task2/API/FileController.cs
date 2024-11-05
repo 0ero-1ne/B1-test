@@ -28,6 +28,7 @@ namespace Task2.API
             return file == null ? NotFound() : new JsonResult(file);
         }
 
+        // сериализация в json формат
         [HttpGet("download/{id}")]
         public IActionResult Download(int id)
         {
@@ -102,9 +103,11 @@ namespace Task2.API
             string newFileName = $"{fileNameWOExtension} ({dateTime})";
             string filePath = $"/files/{newFileName}{Path.GetExtension(file.FileName)}";
 
+            // сохраним файл на сервер
             using FileStream stream = new(_hostEnvironment?.WebRootPath + filePath, FileMode.Create);
             await file.CopyToAsync(stream);
 
+            // сохранение данных из файла в бд
             var result = await SaveToDb(newFileName, filePath);
 
             if (result == false)
@@ -126,6 +129,7 @@ namespace Task2.API
             workbook = excel.Workbooks.Open(_hostEnvironment?.WebRootPath + filePath);
             worksheet = workbook.Worksheets[1];
 
+            // Используем транзакцию, чтобы всё сохранилось за раз
             using var transaction = _db?.Database.BeginTransaction();
             try
             {
@@ -224,6 +228,7 @@ namespace Task2.API
 
                 await transaction!.CommitAsync();
 
+                // Очистка пямяти от ресурсов Excel
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
