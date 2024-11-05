@@ -32,10 +32,10 @@ else if (ViewBag.UploadStatus == false)
         @foreach (var file in ViewBag.Files)
         {
             <a class="list-group-item list-group-item-action"
-               asp-controller="home"
-               asp-action="file"
-               asp-route-id="@file.Id"
-               role="button">
+                asp-controller="home"
+                asp-action="file"
+                asp-route-id="@file.Id"
+                role="button">
                 @file.Name
             </a>
         }

@@ -8,6 +8,15 @@
     ViewBag.ButtonAction = "index";
 }
 
+<a class="btn btn-outline-dark"
+    asp-controller="File"
+    asp-action="Download"
+    asp-route-id="@ViewBag.File.Id"
+    role="button"
+    style="margin-bottom: 20px;">
+    Экспорт
+</a>
+
 <table class="table table-bordered border-black align-middle">
     <thead>
         <tr>

@@ -2,7 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Office.Interop.Excel;
 using System.Globalization;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Text.Unicode;
+using System.Xml;
 using Task2.Models;
 
 namespace Task2.API
@@ -14,12 +19,67 @@ namespace Task2.API
         private readonly Task2DbContext? _db = dbContext;
         private readonly IWebHostEnvironment? _hostEnvironment = webHost;
 
-        [HttpGet]
+        [HttpGet("get/{id}")]
         public async Task<ActionResult<Models.File>> Get(int id)
         {
             var file = await _db?.Files.FirstOrDefaultAsync(file => file.Id == id)!;
-            _db?.Dispose();
             return file == null ? NotFound() : new JsonResult(file);
+        }
+
+        [HttpGet("download/{id}")]
+        public IActionResult Download(int id)
+        {
+            var file = _db?.Files.FirstOrDefault(file => file.Id == id)!;
+
+            if (file == null)
+            {
+                return NotFound($"No file with {id} id");
+            }
+
+            var bills = _db?.Bills.Where(bill => bill.FileId == file.Id).Select(bill => new
+            {
+                bookNumber = bill.BookNumber,
+                insaldoActive = bill.InsaldoActive,
+                insaldoPassive = bill.InsaldoPassive,
+                turnoversDebit = bill.TurnoversDebit,
+                turnoversCreit = bill.TurnoversCredit,
+                outsaldoActive = bill.OutsaldoActive,
+                outsaldoPassive = bill.OutsaldoPassive
+            });
+
+            var result = new
+            {
+                fileName = file.Name,
+                fileDescription = file.Description,
+                startDate = file.StartDate,
+                endDate = file.EndDate,
+                bankName = _db!.Banks.FirstOrDefault(bank => bank.Id == file.BankId)!.Name,
+                bills,
+                sums = new
+                {
+                    insaldoActive = _db!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.InsaldoActive),
+                    insaldoPassive = _db!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.InsaldoPassive),
+                    turnoversDebit = _db!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.TurnoversDebit),
+                    turnoversCreit = _db!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.TurnoversCredit),
+                    outsaldoActive = _db!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.OutsaldoActive),
+                    outsaldoPassive = _db!.Bills.Where(bill => bill.FileId == file.Id && bill.BookNumber >= 1000).Sum(bill => bill.OutsaldoPassive),
+                }
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                WriteIndented = true
+            };
+            string resultToJson = JsonSerializer.Serialize(result, options);
+            var fileName = $"{file.Name}.json";
+            var mimeType = "text/plain";
+            var resultBytes = Encoding.UTF8.GetBytes(resultToJson);
+
+            return new FileContentResult(resultBytes, mimeType)
+            {
+                FileDownloadName = fileName,
+            };
         }
 
         [HttpPost]
